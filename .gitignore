@@ -35,6 +35,7 @@ tmp/
 data_local/
 examples/output/
 examples/data/
+site/
 
 # Generated figures (allow only curated synthetic doc assets)
 *.png

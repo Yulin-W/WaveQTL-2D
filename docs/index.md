@@ -1,8 +1,3 @@
----
-layout: default
-title: WaveQTL-2D Documentation
----
-
 # WaveQTL-2D Documentation
 
 **WaveQTL-2D** is a lightweight prototype wrapper around [WaveQTL (Shim & Stephens, 2015)](https://github.com/heejungshim/WaveQTL) for testing and localising spatial differences between two conditions across multiple samples of **2D symmetric matrices**.
@@ -22,7 +17,8 @@ sudo apt-get update && sudo apt-get install -y build-essential libgsl-dev
 brew install gsl
 ```
 
-> **Note for macOS / dynamic GSL**: If the linker reports missing static libraries (`-lgsl` / `-lc` with `-static`), remove `-static` on line 35 of `src/Makefile` (and add `-std=gnu++14` if compiling with modern Clang) prior to installing.
+!!! note "macOS / dynamic GSL"
+    If the linker reports missing static libraries (`-lgsl` / `-lc` with `-static`), remove `-static` on line 35 of `src/Makefile` (and add `-std=gnu++14` if compiling with modern Clang) prior to installing.
 
 ### 1-Step Installation
 Running `pip install .` automatically builds the C++ `WaveQTL` engine under the hood via `make all` and packages it into the Python wheel:

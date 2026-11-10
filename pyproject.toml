@@ -16,6 +16,11 @@ dependencies = [
     "PyWavelets>=1.4",
 ]
 
+[project.optional-dependencies]
+docs = [
+    "mkdocs-material>=9.5",
+]
+
 [project.scripts]
 waveqtl-2d = "waveqtl2d.cli:main"
 

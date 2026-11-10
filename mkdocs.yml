@@ -1,0 +1,50 @@
+site_name: WaveQTL-2D
+site_description: 2D symmetric matrix comparison wrapper around WaveQTL using 2D Haar wavelets
+site_url: https://yulin-w.github.io/WaveQTL-2D/
+repo_url: https://github.com/Yulin-W/WaveQTL-2D
+repo_name: Yulin-W/WaveQTL-2D
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.top
+    - navigation.sections
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+  - search
+
+nav:
+  - Overview: index.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Yulin-W/WaveQTL-2D
+      name: GitHub Repository
