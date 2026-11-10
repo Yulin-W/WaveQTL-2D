@@ -19,15 +19,33 @@ import numpy as np
 import pandas as pd
 
 
-def _auto_symmetric_vmax(values: np.ndarray, default: float = 0.60) -> float:
-    """Compute a clean symmetric color limit from observed values."""
-    clean = np.abs(values[~np.isnan(values)])
+def _auto_symmetric_vmax(df_or_vals, default: float = 0.60) -> float:
+    """
+    Compute a clean symmetric color limit from observed off-diagonal values.
+    Excludes diagonal and immediate off-diagonal cells (|cell_i - cell_j| <= 1)
+    to prevent diagonal smoothing spikes from washing out off-diagonal contrast.
+    """
+    if isinstance(df_or_vals, pd.DataFrame):
+        df = df_or_vals
+        if "cell_i" in df.columns and "cell_j" in df.columns and "value" in df.columns:
+            off_mask = (np.abs(df["cell_i"] - df["cell_j"]) >= 2) & (~df["value"].isna())
+            off_vals = np.abs(df.loc[off_mask, "value"].to_numpy(dtype=np.float64))
+            if off_vals.size > 0:
+                q = float(np.percentile(off_vals, 95.0))
+                if q > 1e-9:
+                    return round(max(min(q, 0.80), 0.05), 2)
+        vals = df["value"].dropna().to_numpy(dtype=np.float64) if "value" in df.columns else np.array([])
+    else:
+        vals = np.asarray(df_or_vals, dtype=np.float64)
+        vals = vals[~np.isnan(vals)]
+
+    clean = np.abs(vals)
     if clean.size == 0:
         return default
-    q = float(np.percentile(clean, 98.0))
+    q = float(np.percentile(clean, 95.0))
     if q <= 1e-9:
         return default
-    return round(max(q, 0.05), 2)
+    return round(max(min(q, 0.80), 0.05), 2)
 
 
 def build_raw_sample_matrix(
@@ -89,7 +107,7 @@ def plot_single_comparison_samples(
     end_cell = int(meta["end_cell"])
     dim = int(meta["grid_dim"])
 
-    plot_vmax = float(vmax) if vmax is not None else _auto_symmetric_vmax(df["value"].to_numpy(dtype=np.float64))
+    plot_vmax = float(vmax) if vmax is not None else _auto_symmetric_vmax(df)
     plot_vmin = -plot_vmax
 
     cmap = plt.get_cmap("RdBu_r").copy()

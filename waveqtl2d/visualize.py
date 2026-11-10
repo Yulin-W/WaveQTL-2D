@@ -283,13 +283,32 @@ def _load_condition_mean_matrices(
 
 
 def _auto_vmax_pair(mat1: np.ndarray, mat2: np.ndarray, default: float = 0.60) -> float:
-    combined = np.concatenate([mat1[~np.isnan(mat1)], mat2[~np.isnan(mat2)]])
-    if combined.size == 0:
-        return default
-    q = float(np.percentile(np.abs(combined), 98.5))
+    """
+    Compute symmetric heatmap limit [-vmax, +vmax] from observed off-diagonal matrix values.
+    Excludes diagonal and immediate off-diagonal cells (|i - j| <= 1) to prevent technical
+    smoothing spikes along the main diagonal from compressing off-diagonal contrast.
+    """
+    off_diag_vals = []
+    for mat in (mat1, mat2):
+        if mat is not None and mat.size > 0:
+            nr, nc = mat.shape
+            r_idx, c_idx = np.indices((nr, nc))
+            off_mask = (np.abs(r_idx - c_idx) >= 2) & (~np.isnan(mat))
+            if np.any(off_mask):
+                off_diag_vals.append(mat[off_mask])
+
+    if not off_diag_vals:
+        combined = np.concatenate([mat1[~np.isnan(mat1)], mat2[~np.isnan(mat2)]])
+        if combined.size == 0:
+            return default
+        q = float(np.percentile(np.abs(combined), 95.0))
+        return round(max(min(q, 0.80), 0.05), 2)
+
+    combined_off = np.concatenate(off_diag_vals)
+    q = float(np.percentile(np.abs(combined_off), 95.0))
     if q <= 1e-9:
         return default
-    return round(max(q, 0.05), 2)
+    return round(max(min(q, 0.80), 0.05), 2)
 
 
 def process_all_outputs(work_dir: Path, output_dir: Path) -> Tuple[pd.DataFrame, pd.DataFrame, List[dict]]:
